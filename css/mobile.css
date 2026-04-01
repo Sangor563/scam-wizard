@@ -21,7 +21,10 @@
   .mobile-only { display: flex !important; }
   .tab-btn.mobile-only { display: flex !important; }
 
-  #gerald-image { font-size: 64px; }
+  /* Gerald: large on tablet too, just slightly smaller than desktop */
+  #gerald-clickable { width: min(50vh, 380px); height: min(50vh, 380px); }
+  #gerald-image { font-size: min(38vh, 290px); }
+  #gerald-image.has-image { width: min(48vh, 360px); height: min(48vh, 360px); }
   #tp-count     { font-size: 22px; }
 
   /* Touch targets for tablet */
@@ -49,7 +52,7 @@
 
   html, body {
     overflow: hidden;
-    font-size: 14px;          /* never below 14px */
+    font-size: clamp(12px, 3vw, 14px);
   }
 
   #game-container {
@@ -57,6 +60,10 @@
     height: 100vh;
     height: 100dvh;           /* avoids iOS address-bar shift */
     padding: var(--gap);
+    padding-top: max(var(--gap), env(safe-area-inset-top));
+    padding-bottom: max(var(--gap), env(safe-area-inset-bottom));
+    padding-left: max(var(--gap), env(safe-area-inset-left));
+    padding-right: max(var(--gap), env(safe-area-inset-right));
     gap: var(--gap);
     overflow: hidden;
   }
@@ -69,45 +76,50 @@
   .tab-btn.mobile-only    { display: flex !important; }
   #tab-stats.mobile-only  { display: flex !important; }
 
-  /* ── Tab bar: on mobile let it sit at DOM-end (bottom).
-     Override the desktop order:-1 so it stays last.       ── */
+  /* ── Reset desktop panel order for mobile vertical stack ─── */
+  #left-panel   { order: 0; }   /* Gerald on top */
+  #middle-panel { order: 1; }   /* shop/tabs below */
+
+  /* ── Tab bar: un-fix from desktop, sit at DOM-end (bottom) ── */
   #tab-bar {
-    order: 0 !important;      /* cancel desktop order:-1 */
+    position: static;           /* cancel desktop position:fixed */
+    order: 0 !important;        /* cancel desktop order:-1 */
+    top: auto; left: auto; right: auto;   /* reset fixed coords */
     border-top: 1px solid var(--border);
     border-bottom: none;
+    border-radius: 0;
     flex-shrink: 0;
     background: var(--panel-alt);
   }
-
   .tab-btn {
-    font-size: 11px;
-    padding: 0 2px;
-    min-height: 48px;         /* ≥44px touch target */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 22px;
+    padding: 0;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+  .tab-text { display: none; } /* emoji only on mobile */
 
   /* ═══════════════════════════════════════════════════════
-     LEFT PANEL → compact hero, 2-column flex row
-     Gerald floats left; #hero-info (overriding display:contents)
-     stacks info on the right.
+     LEFT PANEL → full-width column: Gerald on top, info strip below
      ═══════════════════════════════════════════════════════ */
   #left-panel {
     width: 100%;
     min-width: unset;
-    flex-direction: row;      /* side-by-side */
-    align-items: stretch;
+    flex-direction: column;   /* stack Gerald above info */
+    align-items: center;
     flex-shrink: 0;
-    gap: 8px;
+    gap: 0;
     overflow: visible;
     padding: 0;
   }
 
-  /* Gerald: LEFT column, fixed width, prominent tap target */
+  /* Gerald: centered, large tap target */
   #gerald-container {
-    flex: 0 0 108px;
-    padding: 10px 8px;
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 8px 8px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -116,71 +128,79 @@
   }
 
   #gerald-clickable {
-    /* 72×72 minimum touch target (Apple HIG + Material) */
-    min-width: 72px;
-    min-height: 72px;
+    width:  min(58vw, 44vh);
+    height: min(58vw, 44vh);
+    min-width: unset;
+    min-height: unset;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    padding: 8px;
+    padding: 0;
   }
 
-  #gerald-image        { font-size: 52px; line-height: 1; }
-  #gerald-image.has-image { width: 88px; height: 88px; }
+  #gerald-image        { font-size: min(44vw, 33vh); line-height: 1; }
+  #gerald-image.has-image { width: min(54vw, 42vh); height: min(54vw, 42vh); }
+
+  /* Gerald tap affordance */
+  #gerald-clickable {
+    border: 2px solid rgba(139,92,246,0.7);
+    box-shadow: 0 0 24px rgba(139,92,246,0.4), 0 0 48px rgba(139,92,246,0.12);
+  }
+  #gerald-clickable::after {
+    content: 'TAP!';
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: center;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
   #gerald-costume-name { font-size: 11px; margin-top: 2px; text-align: center; }
   #gerald-state-label  { font-size: 10px; color: var(--text-dim); text-align: center; }
 
-  /* #hero-info: RIGHT column — override display:contents with flex column */
+  /* #hero-info: compact horizontal strip below Gerald */
   #hero-info {
     display: flex !important; /* override contents */
-    flex: 1;
-    flex-direction: column;
+    flex: 0 0 auto;
+    flex-direction: row;
+    width: 100%;
     gap: 5px;
     min-width: 0;
     overflow: hidden;
   }
 
-  /* Logo: compact horizontal row */
-  #logo {
-    padding: 5px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-  #logo-title { font-size: 14px; font-weight: 700; }
-  #town-name  { font-size: 10px; white-space: nowrap; }
+  /* Logo: hidden on mobile (Gerald is the brand) */
+  #logo { display: none !important; }
 
-  /* TP display: left-aligned, larger number */
+  /* TP display: compact, flex:1 to fill available strip width */
   #tp-display {
-    padding: 5px 10px;
+    flex: 1;
+    padding: 4px 8px;
     text-align: left;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
   }
-  #tp-count          { font-size: 22px; line-height: 1.15; }
-  #tp-per-sec        { font-size: 12px; }
-  #temp-mult-display { font-size: 11px; margin-top: 2px; }
+  #tp-count          { font-size: clamp(15px, 4vw, 18px); line-height: 1.15; }
+  #tp-per-sec        { font-size: clamp(10px, 2.5vw, 11px); }
+  #temp-mult-display { font-size: clamp(9px, 2.5vw, 10px); margin-top: 1px; }
 
-  /* HQ display */
+  /* HQ display: compact */
   #hq-display {
-    padding: 4px 10px;
-    font-size: 13px;
-    gap: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    gap: 5px;
     flex-shrink: 0;
   }
-  #hq-icon { font-size: 15px; }
-  #hq-name { font-size: 12px; }
+  #hq-icon { font-size: 14px; }
+  #hq-name { font-size: 11px; }
 
-  /* Milestone bar */
-  #milestone-container {
-    padding: 4px 10px;
-    flex-shrink: 0;
-  }
-  #milestone-label    { font-size: 11px; }
-  #milestone-text     { font-size: 10px; }
-  #milestone-bar-wrap { height: 6px; }
+  /* Milestone bar: hidden on mobile (in Stats tab) */
+  #milestone-container { display: none; }
+
+  /* Modifier panel: hidden on mobile (in Events tab) */
+  #modifier-panel { display: none; }
 
   /* Mini stats: hidden (shown in Stats tab) */
   #mini-stats    { display: none; }
@@ -218,25 +238,25 @@
 
   /* ── Card sizes: comfortable touch targets ─────────────── */
   .tier-card {
-    min-height: 60px;
-    padding: 10px 12px;
-    gap: 10px;
+    min-height: 52px;
+    padding: 7px 10px;
+    gap: 8px;
   }
-  .tier-icon  { font-size: 26px; width: 32px; }
-  .tier-name  { font-size: 14px; }
+  .tier-icon  { font-size: 22px; width: 28px; }
+  .tier-name  { font-size: clamp(11px, 3vw, 13px); }
   .tier-desc  { display: none; }
-  .tier-count { font-size: 20px; }
-  .tier-cost  { font-size: 12px; }
-  .tier-hps   { font-size: 11px; }
+  .tier-count { font-size: clamp(15px, 4vw, 18px); }
+  .tier-cost  { font-size: clamp(10px, 2.5vw, 11px); }
+  .tier-hps   { font-size: clamp(9px, 2.5vw, 10px); }
 
   .upgrade-card {
     min-height: 58px;
     padding: 10px 12px;
   }
-  .upgrade-icon   { font-size: 22px; }
-  .upgrade-name   { font-size: 14px; }
-  .upgrade-effect { font-size: 12px; }
-  .upgrade-cost   { font-size: 12px; }
+  .upgrade-icon   { font-size: clamp(18px, 4vw, 22px); }
+  .upgrade-name   { font-size: clamp(12px, 3vw, 14px); }
+  .upgrade-effect { font-size: clamp(10px, 2.5vw, 12px); }
+  .upgrade-cost   { font-size: clamp(10px, 2.5vw, 12px); }
 
   .hq-card       { padding: 12px; }
   .hq-icon       { font-size: 26px; }
@@ -283,8 +303,9 @@
   #offline-box h2 { font-size: 18px; }
   #offline-desc   { font-size: 13px; }
 
-  /* Victims: appear below the hero section */
-  .victim-popup { top: 60% !important; max-width: 170px; }
+  /* Victim layer: full width on mobile (no side panels) */
+  #victim-layer { left: 0; right: 0; }
+  .victim-popup { top: 55% !important; max-width: 170px; }
 
   /* Toasts: narrower */
   .notification { font-size: 12px; padding: 7px 14px; max-width: 90vw; }
@@ -294,17 +315,23 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   VERY SMALL PHONES  ≤ 380px
+   SMALL PHONES  ≤ 480px  (iPhone SE, budget Android, etc.)
    ═══════════════════════════════════════════════════════════ */
-@media (max-width: 380px) {
-  #gerald-container { flex: 0 0 90px; }
-  #gerald-image     { font-size: 42px; }
-  #gerald-clickable { min-width: 58px; min-height: 58px; padding: 6px; }
-  #tp-count         { font-size: 18px; }
-  #logo-title       { font-size: 13px; }
-  .tab-btn          { font-size: 10px; min-height: 44px; }
-  .tier-name        { font-size: 13px; }
-  .tier-count       { font-size: 17px; }
+@media (max-width: 480px) {
+  #gerald-clickable { width: 100px; height: 100px; min-width: unset; min-height: unset; }
+  #gerald-image     { font-size: 72px; }
+  #gerald-image.has-image { width: 96px; height: 96px; }
+  #tp-count         { font-size: clamp(13px, 3.5vw, 16px); }
+  #tp-per-sec       { font-size: clamp(9px, 2vw, 11px); }
+  #logo-title       { font-size: clamp(11px, 2.5vw, 13px); }
+  .tab-btn          { font-size: clamp(16px, 4vw, 20px); min-height: 44px; padding: 0; }
+  .tier-name        { font-size: clamp(10px, 2.5vw, 12px); }
+  .tier-count       { font-size: clamp(13px, 3.5vw, 16px); }
+  .tier-cost        { font-size: clamp(9px, 2vw, 11px); }
+  .upgrade-name     { font-size: clamp(11px, 2.5vw, 13px); }
+  .upgrade-effect   { font-size: clamp(9px, 2vw, 11px); }
+  .upgrade-card     { min-height: 52px; padding: 8px 10px; }
+  .modal-choice     { min-height: 48px; font-size: clamp(12px, 3vw, 14px); padding: 10px 12px; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -314,41 +341,69 @@
 @media (max-width: 767px) and (orientation: landscape) {
   #game-container {
     flex-direction: row;
-    padding: 6px;
-    gap: 6px;
+    padding: max(4px, env(safe-area-inset-top)) max(4px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left));
+    gap: 4px;
   }
 
-  /* Left panel: narrow, back to vertical flex */
+  /* Tab bar: vertical left sidebar */
+  #tab-bar {
+    order: -1;
+    flex-direction: column;
+    width: 44px;
+    min-width: 44px;
+    height: 100%;
+    border-top: none;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    flex-shrink: 0;
+    padding: 4px 0;
+    gap: 2px;
+  }
+  .tab-btn {
+    width: 44px;
+    min-height: 44px;
+    font-size: 18px;
+    flex-direction: column;
+    padding: 4px 0;
+  }
+
+  /* Left panel: Gerald at 80px */
   #left-panel {
     flex-direction: column;
-    width: 170px;
-    min-width: 170px;
+    width: 80px;
+    min-width: 80px;
     flex-shrink: 0;
     overflow-y: auto;
-    gap: 6px;
+    gap: 4px;
     padding: 0;
     max-height: 100%;
+    align-items: center;
   }
 
-  /* hero-info: revert to column (it's already flex column) */
+  #gerald-container { flex: 0 0 auto; padding: 4px; width: 100%; align-items: center; }
+  #gerald-clickable { width: 68px; height: 68px; min-width: unset; min-height: unset; }
+  #gerald-image     { font-size: 48px; }
+  #gerald-image.has-image { width: 64px; height: 64px; }
+  #gerald-state-label { display: none; }
+  #gerald-clickable::after { font-size: 9px; }
+
+  /* hero-info: compact column */
   #hero-info {
     display: flex !important;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
+    width: 100%;
   }
-
-  #gerald-container { flex: 0 0 auto; padding: 8px; }
-  #gerald-image     { font-size: 40px; }
-  #gerald-clickable { min-width: 52px; min-height: 52px; padding: 6px; }
-  #gerald-state-label { display: none; }
+  #tp-count  { font-size: 12px; }
+  #tp-per-sec { font-size: 9px; }
+  #hq-name   { font-size: 9px; }
 
   #mini-stats    { display: none; }
   #ad-reward-btn { display: none; }
 
-  /* Middle panel: normal column, tab bar at bottom */
+  /* Middle panel: scam list fills remaining space */
   #middle-panel { flex: 1; min-width: 0; flex-direction: column; }
-  .tab-btn { min-height: 40px; font-size: 11px; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -374,8 +429,14 @@
   .tier-card:hover:not(.locked):not(.cant-afford)      { background: var(--panel-alt); border-color: var(--border); }
   .upgrade-card:hover:not(.purchased):not(.cant-afford) { background: var(--panel-alt); border-color: var(--border); }
 
-  /* Play mini-game buttons */
-  .tier-play-btn { min-height: 36px; font-size: 12px; padding: 4px 10px; }
+  /* Play mini-game buttons: smaller, right-aligned */
+  .tier-play-btn {
+    min-height: 28px;
+    font-size: 11px;
+    padding: 3px 8px;
+    margin-top: 4px;
+    align-self: flex-end;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Scam Wizard</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/mobile.css">
+  <!-- Poki SDK — must load synchronously before game scripts so window.PokiSDK is available -->
+  <script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>
 </head>
 <body>
 
@@ -164,13 +166,13 @@
       <!-- Tab bar: LAST in DOM. Mobile: stays at bottom (flex-column end).
            Desktop: order:-1 in CSS floats it to top. -->
       <nav id="tab-bar" role="tablist">
-        <button class="tab-btn active" data-tab="scams"    role="tab" aria-selected="true">🎪 Scams</button>
-        <button class="tab-btn"        data-tab="upgrades" role="tab" aria-selected="false">⚗️ Upgrades</button>
-        <button class="tab-btn"        data-tab="hq"       role="tab" aria-selected="false">🏠 HQ</button>
-        <button class="tab-btn"        data-tab="gerald"   role="tab" aria-selected="false">🧙 Gerald</button>
-        <button class="tab-btn"        data-tab="events"   role="tab" aria-selected="false">⚡ Events</button>
-        <button class="tab-btn"        data-tab="map"      role="tab" aria-selected="false">🗺️ Map</button>
-        <button class="tab-btn mobile-only" data-tab="stats" role="tab" aria-selected="false">🏆 More</button>
+        <button class="tab-btn active" data-tab="scams"    role="tab" aria-selected="true">🎪<span class="tab-text"> Scams</span></button>
+        <button class="tab-btn"        data-tab="upgrades" role="tab" aria-selected="false">⚗️<span class="tab-text"> Upgrades</span></button>
+        <button class="tab-btn"        data-tab="hq"       role="tab" aria-selected="false">🏠<span class="tab-text"> HQ</span></button>
+        <button class="tab-btn"        data-tab="gerald"   role="tab" aria-selected="false">🧙<span class="tab-text"> Gerald</span></button>
+        <button class="tab-btn"        data-tab="events"   role="tab" aria-selected="false">⚡<span class="tab-text"> Events</span></button>
+        <button class="tab-btn"        data-tab="map"      role="tab" aria-selected="false">🗺️<span class="tab-text"> Map</span></button>
+        <button class="tab-btn mobile-only" data-tab="stats" role="tab" aria-selected="false">🏆<span class="tab-text"> More</span></button>
       </nav>
     </main>
 
@@ -178,17 +180,21 @@
     <aside id="right-panel">
       <div id="tasks-panel" class="tasks-panel"></div>
 
-      <h3 class="panel-title">🏆 Achievements</h3>
-      <div id="achievements-list"></div>
+      <div class="right-section">
+        <div class="panel-title">🏆 Achievements</div>
+        <div id="achievements-list"></div>
+      </div>
 
-      <div id="rival-panel">
-        <h4 class="panel-title">⚔️ Competition</h4>
-        <div id="rival-stats">
-          <div id="rival-merlin-row">Merlin: <span id="rival-merlin-tp">0</span> TP</div>
-          <div id="rival-you-row">You: <span id="rival-you-tp">0</span> TP</div>
+      <div class="right-section">
+        <div id="rival-panel">
+          <div class="panel-title">⚔️ Competition</div>
+          <div id="rival-stats">
+            <div id="rival-merlin-row">Merlin: <span id="rival-merlin-tp">0</span> TP</div>
+            <div id="rival-you-row">You: <span id="rival-you-tp">0</span> TP</div>
+          </div>
+          <div id="rival-status-label"></div>
+          <div id="merlin-bubble" class="hidden"></div>
         </div>
-        <div id="rival-status-label"></div>
-        <div id="merlin-bubble" class="hidden"></div>
       </div>
     </aside>
 
