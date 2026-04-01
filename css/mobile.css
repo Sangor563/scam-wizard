@@ -1,0 +1,460 @@
+/* ============================================================
+   mobile.css — Three-breakpoint responsive system
+   Desktop >1024px : 3-column layout (main.css handles this)
+   Tablet 768–1024px : 2-column, no right panel
+   Mobile <768px   : 1-column, hero top + bottom tab nav
+   ============================================================ */
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET  768px – 1024px
+   Two columns: left panel (220px) + middle panel (flex:1)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 1024px) {
+  :root {
+    --left-w: 220px;
+    --right-w: 0px;
+  }
+
+  #right-panel { display: none; }
+
+  /* Show Stats tab on tablet too */
+  .mobile-only { display: flex !important; }
+  .tab-btn.mobile-only { display: flex !important; }
+
+  #gerald-image { font-size: 64px; }
+  #tp-count     { font-size: 22px; }
+
+  /* Touch targets for tablet */
+  .tier-card    { min-height: 58px; }
+  .upgrade-card { min-height: 54px; }
+  .tab-btn      { min-height: 44px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE PORTRAIT  < 768px
+   Layout:
+     ┌──────────────────────────┐
+     │  😩 Gerald  │ Logo + TP │  ← #left-panel flex-row (hero)
+     │  (big tap)  │ HQ + bar  │
+     ├──────────────────────────┤
+     │   Tab content (scrolls)  │  ← #middle-panel flex:1
+     ├──────────────────────────┤
+     │  🎪  ⚗️  🏠  🧙  ⚡  📊  │  ← #tab-bar at DOM-end = visual bottom
+     └──────────────────────────┘
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── Base ──────────────────────────────────────────────── */
+  :root { --gap: 6px; }
+
+  html, body {
+    overflow: hidden;
+    font-size: 14px;          /* never below 14px */
+  }
+
+  #game-container {
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;           /* avoids iOS address-bar shift */
+    padding: var(--gap);
+    gap: var(--gap);
+    overflow: hidden;
+  }
+
+  /* Right panel hidden; content in Stats tab instead */
+  #right-panel { display: none; }
+
+  /* Unhide mobile-only elements */
+  .mobile-only            { display: flex !important; }
+  .tab-btn.mobile-only    { display: flex !important; }
+  #tab-stats.mobile-only  { display: flex !important; }
+
+  /* ── Tab bar: on mobile let it sit at DOM-end (bottom).
+     Override the desktop order:-1 so it stays last.       ── */
+  #tab-bar {
+    order: 0 !important;      /* cancel desktop order:-1 */
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    flex-shrink: 0;
+    background: var(--panel-alt);
+  }
+
+  .tab-btn {
+    font-size: 11px;
+    padding: 0 2px;
+    min-height: 48px;         /* ≥44px touch target */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     LEFT PANEL → compact hero, 2-column flex row
+     Gerald floats left; #hero-info (overriding display:contents)
+     stacks info on the right.
+     ═══════════════════════════════════════════════════════ */
+  #left-panel {
+    width: 100%;
+    min-width: unset;
+    flex-direction: row;      /* side-by-side */
+    align-items: stretch;
+    flex-shrink: 0;
+    gap: 8px;
+    overflow: visible;
+    padding: 0;
+  }
+
+  /* Gerald: LEFT column, fixed width, prominent tap target */
+  #gerald-container {
+    flex: 0 0 108px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  #gerald-clickable {
+    /* 72×72 minimum touch target (Apple HIG + Material) */
+    min-width: 72px;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 8px;
+  }
+
+  #gerald-image        { font-size: 52px; line-height: 1; }
+  #gerald-image.has-image { width: 88px; height: 88px; }
+  #gerald-costume-name { font-size: 11px; margin-top: 2px; text-align: center; }
+  #gerald-state-label  { font-size: 10px; color: var(--text-dim); text-align: center; }
+
+  /* #hero-info: RIGHT column — override display:contents with flex column */
+  #hero-info {
+    display: flex !important; /* override contents */
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* Logo: compact horizontal row */
+  #logo {
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  #logo-title { font-size: 14px; font-weight: 700; }
+  #town-name  { font-size: 10px; white-space: nowrap; }
+
+  /* TP display: left-aligned, larger number */
+  #tp-display {
+    padding: 5px 10px;
+    text-align: left;
+    flex-shrink: 0;
+  }
+  #tp-count          { font-size: 22px; line-height: 1.15; }
+  #tp-per-sec        { font-size: 12px; }
+  #temp-mult-display { font-size: 11px; margin-top: 2px; }
+
+  /* HQ display */
+  #hq-display {
+    padding: 4px 10px;
+    font-size: 13px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  #hq-icon { font-size: 15px; }
+  #hq-name { font-size: 12px; }
+
+  /* Milestone bar */
+  #milestone-container {
+    padding: 4px 10px;
+    flex-shrink: 0;
+  }
+  #milestone-label    { font-size: 11px; }
+  #milestone-text     { font-size: 10px; }
+  #milestone-bar-wrap { height: 6px; }
+
+  /* Mini stats: hidden (shown in Stats tab) */
+  #mini-stats    { display: none; }
+
+  /* Ad button: hidden (shown in Stats tab) */
+  #ad-reward-btn { display: none; }
+
+  /* Prestige button: compact, only visible when unlocked */
+  #prestige-btn {
+    font-size: 11px;
+    padding: 6px 8px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     MIDDLE PANEL → fills remaining height
+     Tab bar is last in DOM → visual bottom (natural order).
+     ═══════════════════════════════════════════════════════ */
+  #middle-panel {
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;   /* normal, NOT reversed */
+  }
+
+  /* Tab content: scrollable, fills all height above tab bar */
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+  }
+
+  .tab-content.active { gap: 6px; }
+
+  /* ── Card sizes: comfortable touch targets ─────────────── */
+  .tier-card {
+    min-height: 60px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .tier-icon  { font-size: 26px; width: 32px; }
+  .tier-name  { font-size: 14px; }
+  .tier-desc  { display: none; }
+  .tier-count { font-size: 20px; }
+  .tier-cost  { font-size: 12px; }
+  .tier-hps   { font-size: 11px; }
+
+  .upgrade-card {
+    min-height: 58px;
+    padding: 10px 12px;
+  }
+  .upgrade-icon   { font-size: 22px; }
+  .upgrade-name   { font-size: 14px; }
+  .upgrade-effect { font-size: 12px; }
+  .upgrade-cost   { font-size: 12px; }
+
+  .hq-card       { padding: 12px; }
+  .hq-icon       { font-size: 26px; }
+  .hq-level-name { font-size: 14px; }
+  .hq-bonus, .hq-cost { font-size: 12px; }
+  .hq-unlocks    { font-size: 11px; }
+
+  .costume-card  { padding: 12px; min-height: 64px; }
+  .costume-emoji { font-size: 30px; }
+  .costume-name  { font-size: 14px; }
+  .costume-bonus, .costume-cost { font-size: 12px; }
+
+  /* ── Modals: bottom-sheet style ────────────────────────── */
+  #modal-overlay,
+  #diary-overlay,
+  #prestige-overlay,
+  #offline-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  #modal-box,
+  #diary-book,
+  #prestige-box,
+  #offline-box {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 20px 20px 10px 10px;
+    padding: 20px 16px 24px;
+  }
+
+  #modal-title   { font-size: 16px; }
+  #modal-body    { font-size: 14px; }
+  .modal-choice  { min-height: 52px; font-size: 14px; padding: 12px 14px; }
+  .choice-risk   { font-size: 11px; }
+
+  #diary-text  { font-size: 18px; line-height: 1.6; }
+  #diary-date  { font-size: 12px; }
+
+  #prestige-box h2  { font-size: 18px; }
+  #prestige-desc    { font-size: 13px; }
+  #prestige-buttons { flex-direction: column; }
+
+  #offline-box h2 { font-size: 18px; }
+  #offline-desc   { font-size: 13px; }
+
+  /* Victims: appear below the hero section */
+  .victim-popup { top: 60% !important; max-width: 170px; }
+
+  /* Toasts: narrower */
+  .notification { font-size: 12px; padding: 7px 14px; max-width: 90vw; }
+
+  /* Combo: slightly smaller */
+  #combo-display { font-size: 42px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VERY SMALL PHONES  ≤ 380px
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 380px) {
+  #gerald-container { flex: 0 0 90px; }
+  #gerald-image     { font-size: 42px; }
+  #gerald-clickable { min-width: 58px; min-height: 58px; padding: 6px; }
+  #tp-count         { font-size: 18px; }
+  #logo-title       { font-size: 13px; }
+  .tab-btn          { font-size: 10px; min-height: 44px; }
+  .tier-name        { font-size: 13px; }
+  .tier-count       { font-size: 17px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE LANDSCAPE  < 768px + landscape
+   Side-by-side: narrow left column + middle panel
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) and (orientation: landscape) {
+  #game-container {
+    flex-direction: row;
+    padding: 6px;
+    gap: 6px;
+  }
+
+  /* Left panel: narrow, back to vertical flex */
+  #left-panel {
+    flex-direction: column;
+    width: 170px;
+    min-width: 170px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    gap: 6px;
+    padding: 0;
+    max-height: 100%;
+  }
+
+  /* hero-info: revert to column (it's already flex column) */
+  #hero-info {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+
+  #gerald-container { flex: 0 0 auto; padding: 8px; }
+  #gerald-image     { font-size: 40px; }
+  #gerald-clickable { min-width: 52px; min-height: 52px; padding: 6px; }
+  #gerald-state-label { display: none; }
+
+  #mini-stats    { display: none; }
+  #ad-reward-btn { display: none; }
+
+  /* Middle panel: normal column, tab bar at bottom */
+  #middle-panel { flex: 1; min-width: 0; flex-direction: column; }
+  .tab-btn { min-height: 40px; font-size: 11px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ALL TOUCH DEVICES — universal 44×44px tap target floor
+   ═══════════════════════════════════════════════════════════ */
+@media (hover: none) and (pointer: coarse) {
+  .tier-card,
+  .upgrade-card,
+  .hq-card,
+  .costume-card    { min-height: 56px; }
+
+  .modal-choice    { min-height: 52px; padding: 12px 14px; }
+  .tab-btn         { min-height: 44px; }
+  .btn-primary,
+  .btn-secondary,
+  .btn-prestige,
+  .btn-diary       { min-height: 44px; }
+
+  /* Gerald: always big enough to tap reliably */
+  #gerald-clickable { min-width: 72px; min-height: 72px; }
+
+  /* Suppress lingering :hover highlights on touch screens */
+  .tier-card:hover:not(.locked):not(.cant-afford)      { background: var(--panel-alt); border-color: var(--border); }
+  .upgrade-card:hover:not(.purchased):not(.cant-afford) { background: var(--panel-alt); border-color: var(--border); }
+
+  /* Play mini-game buttons */
+  .tier-play-btn { min-height: 36px; font-size: 12px; padding: 4px 10px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NEW FEATURE OVERRIDES — mobile <768px
+   Spell charge, modifier panel, tasks, map, mini-game modal,
+   victims (VIP), spell popup/flash
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── Spell charge bar: compact inside Gerald container ─── */
+  #spell-charge-wrap  { width: 100%; padding: 0 4px; }
+  #spell-charge-bar   { height: 5px; }
+  #spell-charge-label { font-size: 10px; gap: 4px; }
+
+  /* ── Hide desktop modifier panel (it's in #hero-info) ──── */
+  #modifier-panel { display: none !important; }
+
+  /* ── Run seed: small label in logo ─────────────────────── */
+  .run-seed-label { font-size: 10px; }
+
+  /* ── Map grid: smaller cells to fit portrait screen ─────── */
+  #map-container  { padding: 4px; }
+  #map-grid       { gap: 5px; padding: 6px; }
+  .map-district   { min-height: 60px; padding: 6px 4px; }
+  .dist-icon      { font-size: 20px; }
+  .dist-name      { font-size: 9px; }
+  .dist-tier-name { font-size: 9px; }
+  .dist-count     { font-size: 10px; }
+
+  /* ── Mini-game overlay: bottom sheet on mobile ──────────── */
+  .minigame-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .minigame-modal {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 16px 32px;
+    max-height: 85vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .minigame-title  { font-size: 16px; }
+  .minigame-body   { font-size: 13px; }
+  .minigame-needle-track { height: 36px; }
+
+  /* ── VIP victim: constrain on small screens ─────────────── */
+  .victim-vip         { max-width: 190px; }
+  .victim-vip-badge   { font-size: 10px; padding: 2px 6px; }
+  .victim-vip-bubble  { font-size: 12px; padding: 8px 10px; }
+
+  /* ── Spell popup: keep it readable but not huge ─────────── */
+  #spell-popup        { font-size: 13px; padding: 12px 16px; max-width: 85vw; }
+
+  /* ── Mobile Stats tab: modifier + tasks ─────────────────── */
+  #mobile-modifier-panel .modifier-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  #mobile-modifier-panel .modifier-icon-lg { font-size: 24px; }
+  #mobile-modifier-panel .modifier-name    { font-size: 13px; font-weight: 600; }
+  #mobile-modifier-panel .modifier-desc    { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  #mobile-tasks-panel .task-item       { font-size: 12px; }
+  #mobile-tasks-panel .task-desc       { font-size: 12px; }
+  #mobile-tasks-panel .task-reward-label { font-size: 11px; }
+  #mobile-tasks-panel .task-progress-text { font-size: 10px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET: hide mobile-only stat panels, show desktop ones
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  #mobile-modifier-panel,
+  #mobile-tasks-panel { display: none; }
+}

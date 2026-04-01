@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Scam Wizard</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+  <!-- Floating victim layer (z-index: 50) -->
+  <div id="victim-layer" aria-hidden="true"></div>
+
+  <!-- Combo display (z-index: 100) -->
+  <div id="combo-display" aria-hidden="true"></div>
+
+  <!-- Spell popup (z-index: 110) -->
+  <div id="spell-popup" aria-hidden="true"></div>
+
+  <!-- Spell edge flash (z-index: 90) -->
+  <div id="spell-flash" aria-hidden="true"></div>
+
+  <!-- Notification toasts -->
+  <div id="notification-area" aria-live="polite"></div>
+
+  <!-- Main 3-column layout -->
+  <div id="game-container">
+
+    <!-- ═══════════════════════════════ LEFT PANEL ═══ -->
+    <aside id="left-panel">
+
+      <!-- Gerald: first child so mobile can float it left -->
+      <div id="gerald-container">
+        <div id="gerald-clickable" role="button" tabindex="0" aria-label="Click Gerald to earn Trust Points">
+          <div id="gerald-image">😩</div>
+          <div id="gerald-click-particles"></div>
+        </div>
+        <div id="gerald-costume-name">Torn Robe</div>
+        <div id="gerald-state-label">Ready to scam</div>
+
+        <div id="spell-charge-wrap">
+          <div id="spell-charge-bar">
+            <div id="spell-charge-fill"></div>
+          </div>
+          <div id="spell-charge-label">⚡ Spell Charge: <span id="spell-charge-pct">0%</span></div>
+        </div>
+      </div>
+
+      <!-- hero-info: display:contents on desktop (transparent),
+           display:flex column on mobile (right column of hero) -->
+      <div id="hero-info">
+        <div id="logo">
+          <div id="logo-title">🪄 Scam Wizard</div>
+          <div id="town-name">Credulton</div>
+          <div id="run-seed" class="run-seed-label">Run #----</div>
+        </div>
+
+        <div id="tp-display">
+          <div id="tp-count">0 <span class="tp-label">TP</span></div>
+          <div id="tp-per-sec">0 per second</div>
+          <div id="temp-mult-display"></div>
+        </div>
+
+        <div id="hq-display">
+          <span id="hq-icon">⛺</span>
+          <span id="hq-name">Gerald's Tent</span>
+        </div>
+
+        <div id="modifier-panel" class="modifier-panel"></div>
+
+        <div id="milestone-container">
+          <div id="milestone-label">Next: 500 TP</div>
+          <div id="milestone-bar-wrap">
+            <div id="milestone-fill" style="width:0%"></div>
+          </div>
+          <div id="milestone-text">0 / 500</div>
+        </div>
+
+        <div id="mini-stats">
+          <div>Clicks: <span id="stat-clicks">0</span></div>
+          <div>Best combo: ×<span id="stat-combo">1</span></div>
+          <div>Prestige: <span id="stat-prestige">0</span>×</div>
+        </div>
+
+        <div id="ad-reward-container" class="hidden">
+          <button id="ad-continue-btn" class="btn-green" onclick="document.getElementById('ad-reward-container').classList.add('hidden')">✓ Continue</button>
+          <button id="ad-reward-btn" class="btn-secondary" onclick="showRewardedAd('income')">🎬 Watch Ad → ×2 income 2min</button>
+        </div>
+        <button id="prestige-btn" class="btn-prestige hidden">
+          ✨ Prestige! (Reset &amp; ×2 forever)
+        </button>
+      </div><!-- /#hero-info -->
+
+    </aside>
+
+    <!-- ═══════════════════════════════ MIDDLE PANEL ═══ -->
+    <main id="middle-panel">
+      <!-- Tab contents first — tab-bar is last in DOM so it sits at
+           bottom on mobile (flex-column). order:-1 in main.css keeps
+           it at the top on desktop. -->
+      <div id="tab-scams"    class="tab-content active" role="tabpanel"><div id="scams-list"></div></div>
+      <div id="tab-upgrades" class="tab-content"        role="tabpanel"><div id="upgrades-list"></div></div>
+      <div id="tab-hq"       class="tab-content"        role="tabpanel"><div id="hq-list"></div></div>
+      <div id="tab-gerald"   class="tab-content"        role="tabpanel"><div id="costumes-list"></div></div>
+      <div id="tab-events"   class="tab-content"        role="tabpanel">
+        <div id="events-log">
+          <p class="events-empty">Events will appear here during gameplay.<br>Gerald is warming up his crystal ball...</p>
+        </div>
+        <div id="limited-event-banner" class="hidden"></div>
+      </div>
+
+      <!-- Map tab -->
+      <div id="tab-map" class="tab-content" role="tabpanel">
+        <div id="map-container">
+          <div id="map-grid"></div>
+          <div id="map-footer">
+            <span id="map-run-seed"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats tab: mobile only -->
+      <div id="tab-stats" class="tab-content mobile-only" role="tabpanel">
+        <div class="mobile-section">
+          <div class="mobile-section-title">⚡ Run Modifier</div>
+          <div id="mobile-modifier-panel"></div>
+        </div>
+        <div class="mobile-section">
+          <div class="mobile-section-title">📋 Daily Tasks</div>
+          <div id="mobile-tasks-panel"></div>
+        </div>
+        <div class="mobile-section">
+          <div class="mobile-section-title">🏆 Achievements</div>
+          <div id="mobile-ach-list"></div>
+        </div>
+        <div class="mobile-section">
+          <div class="mobile-section-title">⚔️ Competition</div>
+          <div id="mobile-rival-box">
+            <div class="mobile-rival-row">Merlin: <span id="mobile-rival-merlin-tp">0</span> TP</div>
+            <div class="mobile-rival-row" id="mobile-rival-you-row">You: <span id="mobile-rival-you-tp">0</span> TP</div>
+            <div id="mobile-rival-status-label" style="font-size:12px;margin-top:6px;font-style:italic"></div>
+            <div id="mobile-merlin-bubble" class="hidden" style="margin-top:8px;font-size:12px;color:var(--text-muted);font-style:italic"></div>
+          </div>
+        </div>
+        <div class="mobile-section">
+          <div class="mobile-section-title">📊 My Stats</div>
+          <div class="mobile-stats-grid">
+            <div>All-time TP</div><div id="mobile-stat-total">0</div>
+            <div>Clicks</div>    <div id="mobile-stat-clicks">0</div>
+            <div>Best combo</div><div>×<span id="mobile-stat-combo">1</span></div>
+            <div>Prestige</div>  <div>×<span id="mobile-stat-prestige">1</span></div>
+          </div>
+        </div>
+        <div class="mobile-section">
+          <div id="mobile-ad-container" class="hidden">
+            <button class="btn-green" style="flex:1" onclick="document.getElementById('mobile-ad-container').classList.add('hidden')">✓ Continue</button>
+            <button class="btn-secondary" style="flex:1" onclick="showRewardedAd('income')">🎬 Watch Ad → ×2 income 2min</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab bar: LAST in DOM. Mobile: stays at bottom (flex-column end).
+           Desktop: order:-1 in CSS floats it to top. -->
+      <nav id="tab-bar" role="tablist">
+        <button class="tab-btn active" data-tab="scams"    role="tab" aria-selected="true">🎪 Scams</button>
+        <button class="tab-btn"        data-tab="upgrades" role="tab" aria-selected="false">⚗️ Upgrades</button>
+        <button class="tab-btn"        data-tab="hq"       role="tab" aria-selected="false">🏠 HQ</button>
+        <button class="tab-btn"        data-tab="gerald"   role="tab" aria-selected="false">🧙 Gerald</button>
+        <button class="tab-btn"        data-tab="events"   role="tab" aria-selected="false">⚡ Events</button>
+        <button class="tab-btn"        data-tab="map"      role="tab" aria-selected="false">🗺️ Map</button>
+        <button class="tab-btn mobile-only" data-tab="stats" role="tab" aria-selected="false">🏆 More</button>
+      </nav>
+    </main>
+
+    <!-- ═══════════════════════════════ RIGHT PANEL ═══ -->
+    <aside id="right-panel">
+      <div id="tasks-panel" class="tasks-panel"></div>
+
+      <h3 class="panel-title">🏆 Achievements</h3>
+      <div id="achievements-list"></div>
+
+      <div id="rival-panel">
+        <h4 class="panel-title">⚔️ Competition</h4>
+        <div id="rival-stats">
+          <div id="rival-merlin-row">Merlin: <span id="rival-merlin-tp">0</span> TP</div>
+          <div id="rival-you-row">You: <span id="rival-you-tp">0</span> TP</div>
+        </div>
+        <div id="rival-status-label"></div>
+        <div id="merlin-bubble" class="hidden"></div>
+      </div>
+    </aside>
+
+  </div><!-- /#game-container -->
+
+  <!-- ═══════════════════════════════ MODALS ═══ -->
+
+  <!-- Random event modal -->
+  <div id="modal-overlay" class="hidden" role="dialog" aria-modal="true">
+    <div id="modal-box">
+      <div id="modal-title"></div>
+      <div id="modal-body"></div>
+      <div id="modal-choices"></div>
+    </div>
+  </div>
+
+  <!-- Gerald's diary overlay -->
+  <div id="diary-overlay" class="hidden" role="dialog" aria-modal="true">
+    <div id="diary-book">
+      <div id="diary-date"></div>
+      <div id="diary-text"></div>
+      <div id="diary-controls">
+        <button id="diary-close" class="btn-diary">Close diary</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prestige confirm modal -->
+  <div id="prestige-overlay" class="hidden" role="dialog" aria-modal="true">
+    <div id="prestige-box">
+      <h2>✨ Relocate to a New Town?</h2>
+      <p id="prestige-desc"></p>
+      <div id="prestige-buttons">
+        <button id="prestige-confirm" class="btn-prestige">Let's go! 🏃</button>
+        <button id="prestige-cancel"  class="btn-secondary">Not yet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline earnings modal -->
+  <div id="offline-overlay" class="hidden" role="dialog" aria-modal="true">
+    <div id="offline-box">
+      <h2>💤 Gerald was napping...</h2>
+      <p id="offline-desc"></p>
+      <button id="offline-ok" class="btn-primary">Collect earnings</button>
+    </div>
+  </div>
+
+  <!-- Scripts — ORDER MATTERS -->
+  <script src="js/state.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/tiers.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/hq.js"></script>
+  <script src="js/costumes.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/combo.js"></script>
+  <script src="js/victims.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/diary.js"></script>
+  <script src="js/rival.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/spells.js"></script>
+  <script src="js/randomizer.js"></script>
+  <script src="js/poki.js"></script>
+  <script src="js/minigames.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

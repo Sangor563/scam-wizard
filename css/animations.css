@@ -1,0 +1,202 @@
+/* ============================================================
+   animations.css — All keyframe animations & transitions
+   ============================================================ */
+
+/* ── Gerald States ────────────────────────────────────────── */
+
+/* Idle sway (5s no click) */
+@keyframes gerald-idle {
+  0%,100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2deg); }
+}
+
+/* Yawn (15s no click) */
+@keyframes gerald-yawn {
+  0%,100% { transform: scaleY(1); }
+  30%,70% { transform: scaleY(0.88) scaleX(1.08); }
+}
+
+/* Rub hands after purchase */
+@keyframes gerald-rubhands {
+  0%,100% { transform: translateX(0); }
+  25%     { transform: translateX(-3px) rotate(-3deg); }
+  75%     { transform: translateX(3px)  rotate(3deg); }
+}
+
+/* Sweat during inspector event */
+@keyframes gerald-sweat {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-4px); }
+  40%,80% { transform: translateX(4px); }
+}
+
+/* Money shower at milestone */
+@keyframes gerald-celebrate {
+  0%   { transform: translateY(0)   scale(1); }
+  30%  { transform: translateY(-18px) scale(1.12); }
+  60%  { transform: translateY(-6px)  scale(1.05); }
+  100% { transform: translateY(0)   scale(1); }
+}
+
+/* Click bounce */
+@keyframes gerald-click {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.82); }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Combo glow */
+@keyframes gerald-glow {
+  0%,100% { filter: drop-shadow(0 0 0px transparent); }
+  50%     { filter: drop-shadow(0 0 16px var(--purple-glow)); }
+}
+
+/* CSS classes applied by JS */
+.gerald-idle      { animation: gerald-idle      2s ease-in-out infinite; }
+.gerald-yawn      { animation: gerald-yawn      1.5s ease-in-out; }
+.gerald-rubhands  { animation: gerald-rubhands  0.3s ease-in-out 3; }
+.gerald-sweat     { animation: gerald-sweat     0.2s ease-in-out 5; }
+.gerald-celebrate { animation: gerald-celebrate 0.7s ease; }
+.gerald-click     { animation: gerald-click     0.2s ease; }
+.gerald-glow      { animation: gerald-glow      0.6s ease 2; }
+
+/* ── Combo Display ────────────────────────────────────────── */
+@keyframes combo-pop {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
+  30%  { opacity: 1; transform: translate(-50%,-50%) scale(1.5); }
+  60%  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(0.8); }
+}
+
+.combo-animate {
+  animation: combo-pop 1.4s ease forwards;
+}
+
+/* ── Click Particles ──────────────────────────────────────── */
+@keyframes particle-up {
+  0%   { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -60px); }
+}
+
+/* ── Notifications ────────────────────────────────────────── */
+@keyframes notif-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes notif-out {
+  from { opacity: 1; }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ── Victim Popup ─────────────────────────────────────────── */
+@keyframes victim-in {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes victim-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-20px); }
+}
+
+@keyframes victim-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes victim-out-right {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(20px); }
+}
+
+.victim-popup.from-left  { animation: victim-in       0.4s ease; }
+.victim-popup.from-right { animation: victim-in-right 0.4s ease; }
+.victim-popup.leaving.from-left  { animation: victim-out       0.4s ease forwards; }
+.victim-popup.leaving.from-right { animation: victim-out-right 0.4s ease forwards; }
+
+/* ── Burst notification ───────────────────────────────────── */
+@keyframes burst-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes burst-pulse {
+  from { opacity: 0.7; }
+  to   { opacity: 1; }
+}
+
+/* ── Tier card burst glow ─────────────────────────────────── */
+@keyframes card-flash {
+  0%   { box-shadow: none; }
+  50%  { box-shadow: 0 0 20px var(--gold); }
+  100% { box-shadow: none; }
+}
+
+.tier-card.just-bought { animation: card-flash 0.5s ease; }
+
+/* ── Achievement unlock ───────────────────────────────────── */
+@keyframes ach-unlock {
+  0%   { transform: scale(0.8); opacity: 0; }
+  50%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.achievement-item.just-unlocked { animation: ach-unlock 0.5s ease; }
+
+/* ── Modal / Overlay entry ────────────────────────────────── */
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+#modal-box, #diary-book, #prestige-box, #offline-box {
+  animation: modal-in 0.25s ease;
+}
+
+/* ── Prestige screen wipe ─────────────────────────────────── */
+@keyframes prestige-wipe {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  100% { clip-path: inset(0 0% 0 0);   opacity: 1; }
+}
+
+.prestige-wipe { animation: prestige-wipe 0.8s ease; }
+
+/* ── Border pulse (limited event) ────────────────────────── */
+@keyframes border-pulse {
+  0%,100% { border-color: var(--gold);   box-shadow: 0 0 8px rgba(245,158,11,0.3); }
+  50%     { border-color: var(--purple); box-shadow: 0 0 16px rgba(139,92,246,0.4); }
+}
+
+/* ── Rival overtake banner ────────────────────────────────── */
+@keyframes overtake-in {
+  0%   { transform: translateY(30px); opacity: 0; }
+  30%  { transform: translateY(-4px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.overtake-banner { animation: overtake-in 0.5s ease; }
+
+/* ── HQ upgrade flash ─────────────────────────────────────── */
+@keyframes hq-upgrade {
+  0%,100% { background: var(--panel-alt); }
+  50%     { background: rgba(16,185,129,0.2); }
+}
+
+.hq-card.just-upgraded { animation: hq-upgrade 0.6s ease; }
+
+/* ── Milestone pop ────────────────────────────────────────── */
+@keyframes milestone-pop {
+  0%   { transform: scaleX(1); }
+  30%  { transform: scaleX(1.04); }
+  100% { transform: scaleX(1); }
+}
+
+.milestone-pop { animation: milestone-pop 0.4s ease; }
+
+/* ── Sweat drops (CSS) ────────────────────────────────────── */
+@keyframes sweat-drop {
+  0%   { top: 10px; opacity: 1; }
+  100% { top: 40px; opacity: 0; }
+}
