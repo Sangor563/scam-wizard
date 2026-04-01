@@ -91,11 +91,14 @@
     flex-shrink: 0;
     background: var(--panel-alt);
   }
+  #tab-bar { display: flex !important; }
   .tab-btn {
+    flex: 1 1 0;          /* equal width for all 7 buttons */
+    min-width: 0;
     font-size: 22px;
     padding: 0;
     min-height: 48px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
   }
@@ -128,8 +131,8 @@
   }
 
   #gerald-clickable {
-    width:  min(58vw, 44vh);
-    height: min(58vw, 44vh);
+    width:  max(50vw, 150px);
+    height: max(50vw, 150px);
     min-width: unset;
     min-height: unset;
     display: flex;
@@ -137,10 +140,11 @@
     justify-content: center;
     border-radius: 50%;
     padding: 0;
+    cursor: pointer;
   }
 
-  #gerald-image        { font-size: min(44vw, 33vh); line-height: 1; }
-  #gerald-image.has-image { width: min(54vw, 42vh); height: min(54vw, 42vh); }
+  #gerald-image        { font-size: clamp(80px, 38vw, 130px); line-height: 1; }
+  #gerald-image.has-image { width: max(46vw, 140px); height: max(46vw, 140px); }
 
   /* Gerald tap affordance */
   #gerald-clickable {
@@ -150,12 +154,14 @@
   #gerald-clickable::after {
     content: 'TAP!';
     display: block;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 900;
     color: var(--gold);
     text-align: center;
-    margin-top: 4px;
-    letter-spacing: 1px;
+    margin-top: 6px;
+    letter-spacing: 2px;
+    animation: tap-bounce 0.8s ease-in-out infinite;
+    text-shadow: 0 0 8px var(--gold);
   }
   #gerald-costume-name { font-size: 11px; margin-top: 2px; text-align: center; }
   #gerald-state-label  { font-size: 10px; color: var(--text-dim); text-align: center; }
@@ -316,11 +322,11 @@
 
 /* ═══════════════════════════════════════════════════════════
    SMALL PHONES  ≤ 480px  (iPhone SE, budget Android, etc.)
+   Keep Gerald large — don't shrink it here
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  #gerald-clickable { width: 100px; height: 100px; min-width: unset; min-height: unset; }
-  #gerald-image     { font-size: 72px; }
-  #gerald-image.has-image { width: 96px; height: 96px; }
+  /* Gerald stays at 50vw / 150px min from the 767px block above */
+  #gerald-image.has-image { width: max(46vw, 140px); height: max(46vw, 140px); }
   #tp-count         { font-size: clamp(13px, 3.5vw, 16px); }
   #tp-per-sec       { font-size: clamp(9px, 2vw, 11px); }
   #logo-title       { font-size: clamp(11px, 2.5vw, 13px); }
@@ -492,6 +498,12 @@
   /* ── Spell popup: keep it readable but not huge ─────────── */
   #spell-popup        { font-size: 13px; padding: 12px 16px; max-width: 85vw; }
 
+  /* ── Stats tab: force single column, full width ─────────── */
+  #tab-stats.tab-content.active { flex-direction: column !important; }
+  #tab-stats .mobile-section    { width: 100%; min-width: 0; flex-shrink: 0; margin-bottom: 0; }
+  #mobile-modifier-panel,
+  #mobile-tasks-panel           { width: 100%; min-width: 0; }
+
   /* ── Mobile Stats tab: modifier + tasks ─────────────────── */
   #mobile-modifier-panel .modifier-header {
     display: flex;
@@ -510,6 +522,70 @@
   #mobile-tasks-panel .task-desc       { font-size: 12px; }
   #mobile-tasks-panel .task-reward-label { font-size: 11px; }
   #mobile-tasks-panel .task-progress-text { font-size: 10px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GERALD TAB — full dashboard layout (mobile portrait)
+   Uses :has() to expand left panel when Gerald tab is active
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Expand hero section to show complete Gerald info */
+  #game-container:has(#tab-gerald.active) #left-panel {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  #game-container:has(#tab-gerald.active) #gerald-container {
+    width: 100%;
+    align-items: center;
+    padding: 12px 8px 6px;
+  }
+  #game-container:has(#tab-gerald.active) #gerald-clickable {
+    width: max(55vw, 160px);
+    height: max(55vw, 160px);
+  }
+  #game-container:has(#tab-gerald.active) #gerald-image {
+    font-size: clamp(90px, 44vw, 140px);
+  }
+  #game-container:has(#tab-gerald.active) #gerald-image.has-image {
+    width: max(52vw, 152px);
+    height: max(52vw, 152px);
+  }
+  #game-container:has(#tab-gerald.active) #gerald-state-label { display: block; }
+
+  /* Hero info strip: switch to compact column */
+  #game-container:has(#tab-gerald.active) #hero-info {
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+  }
+  #game-container:has(#tab-gerald.active) #tp-display {
+    text-align: center;
+    padding: 6px 10px;
+  }
+  #game-container:has(#tab-gerald.active) #tp-count {
+    font-size: clamp(22px, 6vw, 32px);
+  }
+  #game-container:has(#tab-gerald.active) #tp-per-sec { font-size: clamp(11px, 3vw, 13px); }
+  #game-container:has(#tab-gerald.active) #hq-display {
+    justify-content: center;
+    padding: 5px 10px;
+  }
+  /* Show progress bar in Gerald tab */
+  #game-container:has(#tab-gerald.active) #milestone-container {
+    display: block !important;
+    padding: 6px 10px;
+    margin: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAP BOUNCE animation for Gerald clickable
+   ═══════════════════════════════════════════════════════════ */
+@keyframes tap-bounce {
+  0%, 100% { transform: translateY(0) scale(1);    opacity: 1; }
+  40%       { transform: translateY(-4px) scale(1.1); opacity: 0.9; }
+  60%       { transform: translateY(-2px) scale(1.05); }
 }
 
 /* ═══════════════════════════════════════════════════════════
