@@ -63,10 +63,136 @@ const COSTUMES_DATA = [
     requiredHq:  5,
     desc:        'Blessed. Definitely. No further questions.',
   },
+
+  // ── Ad-unlocked special costumes ──────────────────────────
+  {
+    id:          'diamond',
+    name:        'Diamond Gerald',
+    emoji:       '💎',
+    unlockType:  'ad',
+    adDuration:  24 * 60 * 60 * 1000,
+    imagePath:   'assets/images/gerald/Gerald_Diamond.png',
+    clickMult:   4,
+    desc:        'Every pebble is now a diamond. Allegedly.',
+  },
+  {
+    id:          'villain',
+    name:        'Villain Arc',
+    emoji:       '😈',
+    unlockType:  'ad',
+    adDuration:  24 * 60 * 60 * 1000,
+    imagePath:   'assets/images/gerald/Gerald_Villain.png',
+    clickMult:   4,
+    desc:        'Gerald has embraced his destiny. Sort of.',
+  },
+  {
+    id:          'pixel',
+    name:        'Pixel Gerald',
+    emoji:       '👾',
+    unlockType:  'ad',
+    adDuration:  24 * 60 * 60 * 1000,
+    imagePath:   'assets/images/gerald/Gerald_Pixel.png',
+    clickMult:   3,
+    desc:        'Retro scamming. 8-bit trust issues.',
+  },
+  {
+    id:          'rainbow',
+    name:        'Rainbow Mode',
+    emoji:       '🌈',
+    unlockType:  'ad',
+    adDuration:  24 * 60 * 60 * 1000,
+    imagePath:   'assets/images/gerald/Gerald_Rainbow.png',
+    clickMult:   3.5,
+    desc:        'Too magical. Gerald is blinding people.',
+  },
+  {
+    id:          'ghost',
+    name:        'Ghost Gerald',
+    emoji:       '👻',
+    unlockType:  'ad',
+    adDuration:  24 * 60 * 60 * 1000,
+    imagePath:   'assets/images/gerald/Gerald_Ghost.png',
+    clickMult:   3.5,
+    desc:        'Still scamming. Even from beyond.',
+  },
+  {
+    id:          'baby',
+    name:        'Baby Gerald',
+    emoji:       '👶',
+    unlockType:  'ad',
+    adDuration:  24 * 60 * 60 * 1000,
+    imagePath:   'assets/images/gerald/Gerald_Baby.png',
+    clickMult:   5,
+    desc:        'The scamming started early. Very early.',
+  },
 ];
 
+// ── Ad costume unlock system ──────────────────────────────────
+
+const AD_COSTUMES_KEY = 'scam_wizard_ad_costumes';
+
+function _loadAdData() {
+  try { return JSON.parse(localStorage.getItem(AD_COSTUMES_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+
+function _saveAdData(data) {
+  try { localStorage.setItem(AD_COSTUMES_KEY, JSON.stringify(data)); }
+  catch (e) {}
+}
+
+function isAdCostumeActive(id) {
+  const d = _loadAdData();
+  return !!d[id] && d[id] > Date.now();
+}
+
+function getAdCostumeRemaining(id) {
+  const d = _loadAdData();
+  return d[id] ? Math.max(0, d[id] - Date.now()) : 0;
+}
+
+function unlockAdCostume(id) {
+  const c = COSTUMES_DATA.find(x => x.id === id);
+  if (!c || c.unlockType !== 'ad') return false;
+  const d = _loadAdData();
+  d[id] = Date.now() + c.adDuration;
+  _saveAdData(d);
+  return true;
+}
+
+function formatAdTimer(ms) {
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// Called periodically from the game loop; reverts expired ad costume if equipped
+function checkAdCostumeExpiry() {
+  const c = COSTUMES_DATA.find(x => x.id === STATE.costume);
+  if (!c || c.unlockType !== 'ad') return;
+  if (isAdCostumeActive(STATE.costume)) return;
+
+  const fallback = [...STATE.purchasedCostumes].reverse().find(id => {
+    const x = COSTUMES_DATA.find(d => d.id === id);
+    return x && x.unlockType !== 'ad';
+  }) || 'robe_torn';
+
+  STATE.costume = fallback;
+  recalcState();
+  showNotification('⌛ Ad costume expired. Back to the old look.', 'warning');
+  if (typeof renderCostumesTab === 'function') renderCostumesTab();
+  if (typeof updateGeraldDisplay === 'function') updateGeraldDisplay();
+}
+
+// ── Costume unlock helpers ────────────────────────────────────
+
 function isCostumeUnlocked(id) {
-  return STATE.purchasedCostumes.includes(id);
+  if (STATE.purchasedCostumes.includes(id)) return true;
+  const c = COSTUMES_DATA.find(x => x.id === id);
+  if (c && c.unlockType === 'ad') return isAdCostumeActive(id);
+  return false;
 }
 
 function canEquipCostume(id) {

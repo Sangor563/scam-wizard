@@ -260,13 +260,15 @@ const Randomizer = (() => {
 
   // ── UI rendering ──────────────────────────────────────────────
   function renderModifier() {
-    const html = !modifier ? '' : `
+    const seedStr = 'Run #' + seed;
+    const html = !modifier ? `<div class="modifier-seed">${seedStr}</div>` : `
       <div class="modifier-header">
         <span class="modifier-icon-lg">${modifier.icon}</span>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="modifier-name">${modifier.name}</div>
           <div class="modifier-desc">${modifier.desc}</div>
         </div>
+        <div class="modifier-seed">${seedStr}</div>
       </div>
     `;
     const el = document.getElementById('modifier-panel');
@@ -275,7 +277,7 @@ const Randomizer = (() => {
     if (mel) mel.innerHTML = html;
 
     const seedEls = document.querySelectorAll('.run-seed-label');
-    seedEls.forEach(s => { s.textContent = 'Run #' + seed; });
+    seedEls.forEach(s => { s.textContent = seedStr; });
   }
 
   function renderTasks() {

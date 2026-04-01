@@ -20,7 +20,9 @@ const Poki = (() => {
           // Do NOT call gameplayStart() here — wait for first click
         })
         .catch(err => {
-          console.warn('[Poki] SDK init failed:', err);
+          // Poki requires gameLoadingFinished even on init failure so the game still starts
+          console.warn('[Poki] SDK init failed, continuing anyway:', err);
+          sdk.gameLoadingFinished();
         });
     } else {
       console.log('[Poki] SDK not present, running in dev mode');
@@ -57,20 +59,24 @@ const Poki = (() => {
   // ── Call when any modal/overlay closes ───────────────────────
   function onModalClose() {
     STATE.paused = false;
-    _startGameplay();
 
-    // Midroll: fire a commercial break if enough time has passed
+    // Midroll: fire a commercial break if enough time has passed.
+    // gameplayStart() is deferred until after the break resolves so we
+    // don't signal active gameplay while an ad is potentially showing.
     const now = Date.now();
     if (now - lastCommercial >= COMMERCIAL_INTERVAL) {
       lastCommercial = now;
       if (sdk) {
         sdk.commercialBreak()
-          .then(() => { _showRewardOffer(); })
-          .catch(() => {});
+          .then(() => { _startGameplay(); _showRewardOffer(); })
+          .catch(() => { _startGameplay(); });
       } else {
-        // Dev mode: still refresh the offer
+        // Dev mode
+        _startGameplay();
         _showRewardOffer();
       }
+    } else {
+      _startGameplay();
     }
   }
 
@@ -106,6 +112,15 @@ const Poki = (() => {
     } else if (reason === 'retry') {
       addTp(Math.floor(STATE.hps * 30));
       showNotification('📺 Ad watched! Retry bonus: 30s income added!', 'event');
+    } else if (reason.startsWith('costume_')) {
+      const id = reason.slice('costume_'.length);
+      unlockAdCostume(id);
+      equipCostume(id);
+      renderCostumesTab();
+      updateGeraldDisplay();
+      saveGame();
+      const c = COSTUMES_DATA.find(x => x.id === id);
+      showNotification(`🎬 ${c ? c.emoji + ' ' + c.name : 'Costume'} unlocked for 24 hours!`, 'event');
     }
   }
 

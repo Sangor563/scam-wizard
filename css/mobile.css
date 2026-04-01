@@ -228,6 +228,7 @@
      ═══════════════════════════════════════════════════════ */
   #middle-panel {
     flex: 1;
+    width: 100%;              /* override desktop width: var(--left-w) = 260px */
     min-height: 0;
     flex-direction: column;   /* normal, NOT reversed */
   }

@@ -139,7 +139,7 @@ html, body {
 #gerald-clickable:active { transform: scale(0.9); }
 
 #gerald-image {
-  font-size: 72px;
+  font-size: 88px;
   line-height: 1;
   display: block;
   transition: transform 0.15s;
@@ -150,8 +150,8 @@ html, body {
 /* Image mode: actual PNG */
 #gerald-image.has-image {
   font-size: 0;
-  width: 160px;
-  height: 160px;
+  width: 200px;
+  height: 200px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -165,11 +165,7 @@ html, body {
   font-weight: 600;
 }
 
-#gerald-state-label {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
+#gerald-state-label { display: none; }
 
 #gerald-click-particles {
   position: absolute;
@@ -472,36 +468,45 @@ html, body {
 .costume-bonus { font-size: 11px; color: var(--purple-glow); margin-top: 2px; }
 .costume-cost  { font-size: 11px; color: var(--gold); margin-top: 2px; }
 
-/* ── Achievements ─────────────────────────────────────────── */
+/* ── Right Panel ──────────────────────────────────────────── */
 #right-panel {
   width: var(--right-w);
   min-width: var(--right-w);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  overflow: hidden;
+  gap: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
 }
 
+#right-panel::-webkit-scrollbar { width: 4px; }
+#right-panel::-webkit-scrollbar-track { background: transparent; }
+#right-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Right panel section wrapper */
+.right-section {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.right-section:last-child { border-bottom: none; }
+
 .panel-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
-  padding: 0 0 4px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
 }
 
 #achievements-list {
-  flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px;
 }
 
 #achievements-list::-webkit-scrollbar { width: 4px; }
@@ -526,10 +531,7 @@ html, body {
 
 /* ── Rival Panel ──────────────────────────────────────────── */
 #rival-panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px;
+  padding: 0;
   flex-shrink: 0;
 }
 
@@ -742,7 +744,10 @@ html, body {
 /* ── Victim Layer ─────────────────────────────────────────── */
 #victim-layer {
   position: fixed;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--left-w) + var(--gap) * 2);
+  right: calc(var(--right-w) + var(--gap) * 2);
   pointer-events: none;
   z-index: 50;
 }
@@ -850,9 +855,52 @@ html, body {
    its children act as direct children of #left-panel.               */
 #hero-info { display: contents; }
 
-/* ── Tab bar: order:-1 keeps it visually first in middle-panel
-   even though it is last in DOM (needed for mobile bottom-nav).     */
+/* ── Desktop: hide elements that are not needed in the left panel ─── */
+#logo       { display: none; }
+#mini-stats { display: none; }
+
+/* ── Tab bar: fixed to top of center column on desktop.
+   order:-1 kept for mobile fallback (overridden in mobile.css). */
 #tab-bar { order: -1; }
+
+/* ── Desktop: Gerald center stage ────────────────────────────────── */
+/* Visual order:  shop (order:0) | Gerald (order:1, flex-1) | achievements (order:2) */
+#left-panel   { order: 1; flex: 1; width: auto; min-width: 0; align-items: center; padding: calc(54px + var(--gap) * 2) 24px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); }
+#middle-panel { order: 0; flex: 0 0 var(--left-w); width: var(--left-w); }
+#right-panel  { order: 2; }
+
+/* Tab bar: position:fixed, floats at top of center column */
+#tab-bar {
+  position: fixed;
+  top: var(--gap);
+  left:  calc(var(--left-w) + var(--gap) * 2);
+  right: calc(var(--right-w) + var(--gap) * 2);
+  z-index: 100;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn { min-height: 46px; font-size: 13px; padding: 0 8px; }
+
+/* Gerald: transparent stage, no border of its own */
+#gerald-container { background: transparent; border: none; border-radius: 0; padding: 0 0 12px; }
+
+/* Large circular click target */
+#gerald-clickable {
+  width:  min(58vh, 520px);
+  height: min(58vh, 520px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid rgba(139,92,246,0.45);
+  box-shadow: 0 0 60px rgba(139,92,246,0.25), 0 0 120px rgba(139,92,246,0.08);
+  padding: 0;
+}
+
+#gerald-image { font-size: min(42vh, 380px); }
+#gerald-image.has-image { width: min(54vh, 480px); height: min(54vh, 480px); }
 
 /* ── Stats tab sections (used in mobile Stats tab) ───────── */
 .mobile-section {
@@ -886,6 +934,104 @@ html, body {
 }
 .mobile-stats-grid > *:nth-child(odd)  { color: var(--text-muted); }
 .mobile-stats-grid > *:nth-child(even) { color: var(--text); font-weight: 600; text-align: right; }
+
+/* ── Ad costume section ───────────────────────────────────── */
+.ad-costumes-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 4px 6px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.ad-costume { align-items: flex-start; gap: 12px; }
+
+.ad-costume-preview {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-costume-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.ad-emoji-fallback { font-size: 32px; line-height: 1; }
+
+.ad-costume-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-watch-ad {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1;
+  min-height: 36px;
+  transition: filter 0.15s, transform 0.1s;
+}
+.btn-watch-ad:hover  { filter: brightness(1.12); }
+.btn-watch-ad:active { transform: scale(0.96); }
+
+.btn-skip-ad {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+  min-height: 36px;
+  transition: filter 0.15s, transform 0.1s;
+}
+.btn-skip-ad:hover  { filter: brightness(1.1); }
+.btn-skip-ad:active { transform: scale(0.96); }
+
+.btn-equip-ad {
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  min-height: 30px;
+  transition: filter 0.15s;
+}
+.btn-equip-ad:hover { filter: brightness(1.15); }
+
+.ad-timer {
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 600;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
 
 /* ── Misc utilities ───────────────────────────────────────── */
 .text-gold    { color: var(--gold); }
@@ -923,26 +1069,22 @@ html, body {
   background: var(--panel-alt);
   border: 1px solid var(--purple);
   border-radius: var(--radius);
-  padding: 8px 10px;
-  margin-top: 6px;
+  padding: 6px 10px;
 }
 .modifier-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
-.modifier-icon-lg { font-size: 22px; flex-shrink: 0; }
-.modifier-name  { font-size: 12px; font-weight: 700; color: var(--purple-glow); }
-.modifier-desc  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.modifier-icon-lg { font-size: 18px; flex-shrink: 0; }
+.modifier-name  { font-size: 11px; font-weight: 700; color: var(--purple-glow); line-height: 1.2; }
+.modifier-desc  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+.modifier-seed  { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
 
 /* ── Tasks panel ──────────────────────────────────────────── */
 .tasks-panel {
-  background: var(--panel-alt);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
   padding: 10px;
-  margin-bottom: 10px;
-  overflow-y: auto;
+  border-bottom: 1px solid var(--border);
 }
 .tasks-title {
   font-size: 11px;

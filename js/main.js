@@ -98,6 +98,9 @@ function gameLoop(now) {
       Randomizer.updateFromState();
       Randomizer.checkTaskCompletion();
     }
+    if (_frameCount % 600 === 0) {   // ~10s: check ad costume expiry
+      checkAdCostumeExpiry();
+    }
     Randomizer.checkEasterEgg();
 
     // Rival update

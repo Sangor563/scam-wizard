@@ -384,7 +384,7 @@ function renderCostumesTab() {
   if (!list) return;
   list.innerHTML = '';
 
-  for (const c of COSTUMES_DATA) {
+  for (const c of COSTUMES_DATA.filter(x => !x.unlockType)) {
     const owned    = isCostumeUnlocked(c.id);
     const equipped = STATE.costume === c.id;
     const hqOk     = STATE.hqLevel >= c.requiredHq;
@@ -425,6 +425,66 @@ function renderCostumesTab() {
       });
     }
     list.appendChild(card);
+  }
+
+  // ── Special (ad) costumes section ────────────────────────────
+  const adCostumes = COSTUMES_DATA.filter(c => c.unlockType === 'ad');
+  if (adCostumes.length) {
+    const hdr = document.createElement('div');
+    hdr.className = 'ad-costumes-header';
+    hdr.textContent = '👀 Special Costumes';
+    list.appendChild(hdr);
+
+    for (const c of adCostumes) {
+      const active   = isAdCostumeActive(c.id);
+      const equipped = STATE.costume === c.id;
+      const remaining = active ? getAdCostumeRemaining(c.id) : 0;
+
+      const card = document.createElement('div');
+      card.className = 'costume-card ad-costume' + (equipped ? ' equipped' : '');
+
+      card.innerHTML = `
+        <div class="ad-costume-preview">
+          <img src="${c.imagePath}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span class="costume-emoji ad-emoji-fallback" style="display:none">${c.emoji}</span>
+        </div>
+        <div class="costume-info">
+          <div class="costume-name">${c.emoji} ${c.name}</div>
+          <div class="costume-bonus">Click ×${c.clickMult}</div>
+          <div class="text-muted" style="font-size:10px;margin-top:2px">${c.desc}</div>
+          ${active
+            ? `<div class="ad-timer" id="ad-timer-${c.id}">⌛ ${formatAdTimer(remaining)} remaining</div>
+               ${equipped
+                 ? '<div class="costume-cost" style="color:var(--green);margin-top:4px">✓ Equipped</div>'
+                 : `<button class="btn-equip-ad" data-id="${c.id}">Equip</button>`}`
+            : `<div class="ad-costume-actions">
+                 <button class="btn-watch-ad" data-id="${c.id}">🎬 Watch Ad → 24h</button>
+                 <button class="btn-skip-ad">✓ Continue without</button>
+               </div>`}
+        </div>
+      `;
+
+      if (active && !equipped) {
+        card.querySelector('.btn-equip-ad').addEventListener('click', (e) => {
+          e.stopPropagation();
+          equipCostume(c.id);
+          renderCostumesTab();
+          updateGeraldDisplay();
+          saveGame();
+        });
+      } else if (!active) {
+        card.querySelector('.btn-watch-ad').addEventListener('click', (e) => {
+          e.stopPropagation();
+          Poki.showRewardedAd('costume_' + c.id);
+        });
+        // "Continue without" is required by Poki — it's already visible, no action needed
+        card.querySelector('.btn-skip-ad').addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+
+      list.appendChild(card);
+    }
   }
 }
 
@@ -585,8 +645,24 @@ function renderMobileStats() {
   prestige.textContent = STATE.prestigeCount;
 }
 
+function updateAdTimers() {
+  for (const c of COSTUMES_DATA.filter(x => x.unlockType === 'ad')) {
+    const el = document.getElementById('ad-timer-' + c.id);
+    if (!el) continue;
+    const rem = getAdCostumeRemaining(c.id);
+    if (rem > 0) {
+      el.textContent = '⌛ ' + formatAdTimer(rem) + ' remaining';
+    } else {
+      // Timer hit zero — re-render the whole tab to show Watch Ad button
+      renderCostumesTab();
+      return;
+    }
+  }
+}
+
 function renderFrame() {
   renderLeftPanel();
   renderTiersTab(); // cheap because it updates in-place
   renderMobileStats();
+  updateAdTimers();
 }
